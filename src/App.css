@@ -1,0 +1,48 @@
+.circular-image {
+    width: 100px; 
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%; 
+  }
+  
+  @font-face {
+    font-family: 'Getman';
+    src: url('../public/Getman.otf') format('truetype'); /* Asegúrate de que la ruta sea correcta */
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Paloseco Light';
+    src: url('../public/Paloseco-Light.ttf') format('truetype'); /* Asegúrate de que la ruta sea correcta */
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  #gothicFont {
+    font-family: Getman;
+  } 
+
+  #navStyle {
+    font-family: Paloseco Light;
+  }
+
+  /* custom.css */
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+  overflow: hidden; /* Oculta el contenido que desborda */
+  display: inline-block; /* Permite que el texto se ajuste al ancho del contenedor */
+}
+
+
