@@ -2,7 +2,7 @@ import Home from "../NavBar/Home";
 import Cities from "../NavBar/Cities";
 import Login from "../NavBar/Login";
 import Guide from "../NavBar/Guide";
-import Logout from "../Navbar/Logout";
+import Logout from "../NavBar/Logout";
 import { useSelector } from "react-redux";
 
 
