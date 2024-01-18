@@ -3,10 +3,7 @@ import Cities from "../NavBar/Cities";
 import Login from "../NavBar/Login";
 import Guide from "../NavBar/Guide";
 import Logout from "../NavBar/Logout";
-<<<<<<< HEAD
 import Cart from "../NavBar/Cart";
-=======
->>>>>>> 37a89d62ac1b3b1949bbb68e726d8bf0b5775e64
 import { useSelector } from "react-redux";
 
 
