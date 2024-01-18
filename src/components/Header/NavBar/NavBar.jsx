@@ -15,7 +15,7 @@ export default function NavBar() {
 
     return (
         <>
-            <nav className="lg:text-[14px] md:text-[10px] mr-10 justify-between hidden  md:flex md:gap-4 md:items-center uppercase " id="navStyle">
+            <nav className="lg:text-[14px] md:text-[10px] mx-10 justify-between hidden  md:flex md:gap-4 md:items-center uppercase " id="navStyle">
                 <div className="justify-between hidden  md:flex md:gap-4 md:items-center uppercase" id="navStyle">
                 <Home />
                 <Cities />

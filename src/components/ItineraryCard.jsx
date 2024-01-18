@@ -91,14 +91,14 @@ const ItineraryCard = ({
               onToggleExpand={() => toggleExpand(itinerary._id)}
             />
             <p
-              className="ml-2 text-xl font-bold text-gray-600 lowercase"
+              className="ml-2 text-md md:text-xl lg:text-xl font-bold text-gray-600 lowercase"
               id="gothicFont"
             >
               Ver material
             </p>
           </div>
-          <h1 className="text-xl font-light">{itinerary.name}</h1>
-          <button onClick={handleBuy} className="w-[163px] h-[30px] shadow-md border-2 font-semibold  text-white text-tracking-wider text-center  bg-violetin border-white hover:border-b-4 hover:border-[#b7f708] rounded-xl  flex items-center justify-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:bg-black">
+{/*           <h1 className="ml-2 text-md md:text-xl lg:text-xl font-light">{itinerary.name}</h1>
+ */}          <button onClick={handleBuy} className=" w-[120px]  md:w-[170px] lg:w-[170px] h-[30px] shadow-md border-2 ml-2 text-sm md:text-xl lg:text-xl font-semibold  text-white text-tracking-wider text-center  bg-violetin border-white hover:border-b-4 hover:border-[#b7f708] rounded-xl  flex items-center justify-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:bg-black">
           Agregar al carrito
         </button>
         </div>
