@@ -1,8 +1,9 @@
 import Cities from "./Cities";
 import Home from "./Home";
-import Blog from "./Blog";
+import Guide from "./Guide";
 import Login from "./Login";
 import Logout from "./Logout";
+import Cart from "./Cart";
 import Profile from "./Profile";
 
 import { useSelector } from "react-redux";
@@ -14,13 +15,14 @@ export default function NavBar() {
 
     return (
         <>
-            <nav className="lg:text-[20px] md:text-[10px] justify-between hidden mx-10 md:flex md:gap-4 md:items-center uppercase " id="navStyle">
-                <div className="justify-between hidden mx-10 md:flex md:gap-4 md:items-center uppercase" id="navStyle">
+            <nav className="lg:text-[14px] md:text-[10px] mr-10 justify-between hidden  md:flex md:gap-4 md:items-center uppercase " id="navStyle">
+                <div className="justify-between hidden  md:flex md:gap-4 md:items-center uppercase" id="navStyle">
                 <Home />
                 <Cities />
-                <Blog />
+                <Guide />
+                <Cart/>
                 </div>
-                <Profile/>
+                {/* <Profile/> */}
                 <div className="flex flex-col items-center lowercase">
                     {photo && (
                         <img

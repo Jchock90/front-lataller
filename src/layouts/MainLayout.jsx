@@ -6,9 +6,11 @@ export default function MainLayout() {
   return (
     <>
         <div className='w-full min-h-screen'>
+          <div className='' > 
             <Header />
             <Outlet />
             <Footer />
+            </div>
         </div>
     </>
   );

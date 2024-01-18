@@ -7,7 +7,7 @@ export default function Arrow({ direction, onClick }) {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="flex cursor-pointer w-[8%] text-gray-500 md:w-1/5 md:self-center "
+        className="flex cursor-pointer w-[30px] text-gray-500  md:self-center "
         onClick={onClick}
       >
         <path strokeLinecap="round" strokeLinejoin="round" d={direction} />

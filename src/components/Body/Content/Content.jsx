@@ -1,25 +1,29 @@
 import ButtonCallTo from "./ButtonCallTo";
 
-export default function Content(src) {
-  src = "public/fondonav.png";
+export default function Content() {
+  const src = "/handcloud.png";
+
   return (
-    <>
-      <div
-        className="flex flex-col items-center mb-16 pb-5 gap-10 lg:w-1/2 m-2 p-2"
-        style={{ backgroundImage: `url(${src})` }}
+    <div
+      className="relative flex flex-col items-center py-5 mb-10 lg:w-1/2 my-2 px-4 bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${src})`,
+        width: "100%",
+        height: "300px", // Ajusta la altura según sea necesario
+      }}
+    >
+      <h1
+        className="text-[#1C1C1C] text-center font-bold py-2 lowercase text-4xl md:text-4xl xl:text-5xl"
+        id="gothicFont"
       >
-        <h1
-          className="flex justify-center font-bold text-[#1C1C1C] p-2 lowercase text-3xl md:text-4xl xl:text-5xl"
-          id="gothicFont"
-        >
-          La Taller Blog!
-        </h1>
-        <p className="flex text-center p-0 font-thin text-2xl text-[#1C1C1C]">
-          Espacio equipado para guiarte a que vos mismx, estampes, moldees,
-          cortes y cosas tu ropa amada💘
-        </p>
+        Guía de medidas
+      </h1>
+      <p className="text-[#1C1C1C] text-center font-thin text-xl md:text-2xl lg:text-2xl xl:text-2xl">
+        Con audios instructivos para que puedas hacer tus mediciones de manera correcta 💘
+      </p>
+      <div className="absolute bottom-0">
         <ButtonCallTo />
       </div>
-    </>
+    </div>
   );
 }

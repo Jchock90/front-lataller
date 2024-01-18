@@ -1,14 +1,18 @@
+// components/store.js
+
 import { configureStore } from "@reduxjs/toolkit";
-import cities_reducer from "./reducers/cities";
-import itinerary_reducer from "./reducers/itineraries";
-import user_reducer from "./reducers/users";
-import activities_reducer from "./reducers/activities";
+import citiesReducer from "./reducers/cities";
+import itinerariesReducer from "./reducers/itineraries";
+import usersReducer from "./reducers/users";
+import activitiesReducer from "./reducers/activities";
+import cartReducer from "./reducers/cart"; // Asegúrate de importar correctamente el reductor del carrito
 
 export default configureStore({
-    reducer: {
-        cities: cities_reducer,
-        itineraries: itinerary_reducer,
-        users: user_reducer,
-        activities: activities_reducer
-    }
-})
+  reducer: {
+    cities: citiesReducer,
+    itineraries: itinerariesReducer,
+    users: usersReducer,
+    activities: activitiesReducer,
+    cart: cartReducer, // Asegúrate de agregar el reductor del carrito correctamente
+  },
+});

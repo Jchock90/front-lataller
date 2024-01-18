@@ -2,7 +2,7 @@ import React from "react";
 
 function ExpandButton({ isExpanded, onToggleExpand }) {
   return (
-    <button onClick={onToggleExpand} className="text-black px-0 py-1 rounded-md">
+    <button onClick={onToggleExpand} className="text-black px-0 py-1 rounded-xl">
       <div
         className={`h-6 w-6 transform ${
           isExpanded ? "rotate-180 scale-y-(-1)" : "rotate-0 scale-y-1"

@@ -1,8 +1,8 @@
 import Home from "../NavBar/Home";
 import Cities from "../NavBar/Cities";
 import Login from "../NavBar/Login";
-import Blog from "../NavBar/Blog";
-import Logout from "../NavBar/Logout";
+import Guide from "../NavBar/Guide";
+import Logout from "../Navbar/Logout";
 import { useSelector } from "react-redux";
 
 
@@ -33,10 +33,10 @@ export default function HamMenu() {
           />
         </svg>
         {isChecked ? (
-          <div className="flex flex-col justify-between gap-6 mt-8 uppercase items-center" id="navStyle">
+          <div className="flex flex-col justify-between gap-6 mt-8 uppercase items-center text-[9px]" id="navStyle">
             <Home />
             <Cities />
-            <Blog />
+            <Guide />
             <div className="flex flex-col items-center lowercase">
                     {photo && (
                         <img

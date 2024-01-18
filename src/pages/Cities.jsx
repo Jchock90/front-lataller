@@ -26,13 +26,13 @@ export default function Cities() {
   }, [reEffect]);
 
   return (
-    <div className="flex flex-col mb-10">
+    <div className="flex flex-col min-h-screen">
       <label
         htmlFor=""
         className="flex justify-center items-center mt-10 mb-10"
       >
         <div
-          className="flex justify-start w-[60%] items-center border-2 px-2 rounded-lg
+          className="flex justify-start w-[60%] items-center border-2 px-2 rounded-xl
            md:w-1/2"
         >
           <svg

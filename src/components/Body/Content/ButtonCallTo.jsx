@@ -4,11 +4,10 @@ export default function ButtonCallTo() {
   return (
     <>
       <Anchor
-        to="/blog"
-        className="flex py-4 px-4 justify-center text-center mb-5 lowercase gap-1 items-center bg-[#c3a9f7] 
-        rounded-full text-2xl font-thin text-white w-1/1 h-5 lg:text-1xl lg:w-1/1" id="gothicFont"
+        to="/guide"
+        className="w-[100px] h-[40px] shadow-md border-2 font-semibold m-6 text-white text-tracking-wider text-center  bg-violetin border-white hover:border-b-4 hover:border-[#b7f708] rounded-xl flex items-center justify-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:bg-black" id="navStyle"
       >
-        Últimos posts
+        Ver más
       </Anchor>
     </>
   );

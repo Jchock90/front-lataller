@@ -9,6 +9,7 @@ function ItineraryList({
   onToggleLike,
   onToggleExpand,
   activities,
+  addToCart, // Nueva prop para pasar la función addToCart
 }) {
   return (
     <>
@@ -23,10 +24,11 @@ function ItineraryList({
             onToggleExpand={() => onToggleExpand(itinerary._id)}
             isExpanded={expandedItinerary === itinerary._id}
             activities={activities}
+            addToCart={addToCart} // Pasando la función addToCart
           />
         ))}
         {itineraries.length === 0 && (
-          <div className="bg-gray-50 p-8 w-[70vw] mb-8 rounded-lg">
+          <div className="p-8 w-[70vw] mb-8 rounded-xl" id="navStyle">
             <h2 className="text-4xl text-center">No se encontraron talleres</h2>
           </div>
         )}

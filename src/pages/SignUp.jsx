@@ -201,7 +201,7 @@ export default function SignUp() {
             <div className="flex justify-center mt-4 mb-4">
               <input
                 type="button"
-                className="bg-[#c3a9f7] cursor-pointer w-[120px] h-[60px] text-white font-semibold text-xl rounded-md py-4 "
+                className="bg-[#c3a9f7] cursor-pointer w-[120px] h-[60px] text-white font-semibold text-xl rounded-xl py-4 "
                 value="Registrate!"
                 onClick={handleSignUp}
               />

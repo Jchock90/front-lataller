@@ -47,7 +47,7 @@ export default function FormSignIn() {
   return (
     <>
       <div className="flex flex-col flex-grow items-center justify-center py-10 md:flex-row md:justify-evenly">
-        <div className=" w-full max-w-sm border-2  rounded-md ">
+        <div className=" w-full max-w-sm border-2  rounded-xl ">
           <form className="bg-white rounded px-8 pt-6 pb-8 mb-4" id="navStyle">
             <div className="flex flex-col items-center justify-center lg:justify-start">
               <p className=" text-4xl lowercase" id="gothicFont">Ingresar:</p>

@@ -1,15 +1,14 @@
 import ButtonViewMore from "./ButtonViewMore";
-import Location from "./Location";
+import LocationCities from "./LocationCities";
 
-export default function Card({ src, city, id }) {
+export default function Card({ src, city, country, id }) {
   return (
     <>
       <div
-        className="flex flex-col justify-between w-80 h-40 bg-center bg-no-repeat bg-cover rounded-md md:w-full"
+        className="flex flex-col w-80 h-[180px] justify-between mx-3 bg-center bg-no-repeat items-center p-2 bg-cover rounded-xl"
         style={{ backgroundImage: `url(${src})` }}
-        id={id}
       >
-        <Location city={city} />
+        <LocationCities city={city} country={country} />
         <ButtonViewMore id={id} />
       </div>
     </>

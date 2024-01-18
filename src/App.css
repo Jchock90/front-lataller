@@ -6,25 +6,25 @@
   }
   
   @font-face {
-    font-family: 'Getman';
-    src: url('../public/Getman.otf') format('truetype'); /* Asegúrate de que la ruta sea correcta */
+    font-family: 'Old';
+    src: url('../Old-English-Text-MT-Regular.ttf') format('truetype'); /* Asegúrate de que la ruta sea correcta */
     font-weight: normal;
     font-style: normal;
   }
 
   @font-face {
-    font-family: 'Paloseco Light';
-    src: url('../public/Paloseco-Light.ttf') format('truetype'); /* Asegúrate de que la ruta sea correcta */
+    font-family: 'CreatoDisplay Regular';
+    src: url('../CreatoDisplay-Regular.otf') format('opentype'); /* Asegúrate de que la ruta sea correcta */
     font-weight: normal;
     font-style: normal;
   }
 
   #gothicFont {
-    font-family: Getman;
+    font-family: Old;
   } 
 
   #navStyle {
-    font-family: Paloseco Light;
+    font-family: CreatoDisplay Regular;
   }
 
   /* custom.css */
@@ -40,9 +40,52 @@
 
 .animate-marquee {
   animation: marquee 25s linear infinite;
-  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-  overflow: hidden; /* Oculta el contenido que desborda */
-  display: inline-block; /* Permite que el texto se ajuste al ancho del contenedor */
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  max-width: 100%; /* Establecer un ancho máximo */
+  box-sizing: border-box; /* Incluye padding y borde en el ancho total */
 }
 
+
+/* Animaciones para tarjetas en modo tablet/desktop */
+@keyframes tablet-desktop-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animaciones para tarjetas en modo mobile */
+@keyframes mobile-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Aplicar animación a las tarjetas */
+.card-transition {
+  animation-duration: 0.5s; /* Duración de la animación */
+  animation-timing-function: ease-in-out; /* Función de temporización de la animación */
+  animation-fill-mode: both; /* Hace que el elemento mantenga su estado final */
+}
+
+/* Aplicar animación específica para tarjetas en modo tablet/desktop */
+.tablet-desktop-slide-in-right {
+  animation-name: tablet-desktop-slide-in-right;
+}
+
+/* Aplicar animación específica para tarjetas en modo mobile */
+.mobile-slide-in-right {
+  animation-name: mobile-slide-in-right;
+}
 

@@ -5,7 +5,7 @@ export default function FooterLogin() {
     <>
       <Anchor
         href="./"
-        /* className="flex justify-between items-center text-4xl font-bold gap-4 text-[black] rounded-lg px-4 py-2 hover:text-black" */
+        /* className="flex justify-between items-center text-4xl font-bold gap-4 text-[black] rounded-xl px-4 py-2 hover:text-black" */
       >
         Ingresar
       </Anchor>

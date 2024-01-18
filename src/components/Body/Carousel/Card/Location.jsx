@@ -17,7 +17,7 @@ export default function Location({ url, city }) {
             fill="white"
           />
         </svg>
-        <h3 className="bg-gray-200 opacity-60 text-black px-2 rounded-md">
+        <h3 className="bg-gray-200 opacity-60 text-black px-2 rounded-xl">
           {city}
         </h3>
       </a>

@@ -1,3 +1,3 @@
-let apiUrl = import.meta.env.VITE_URL_BACK
+const apiUrl = 'http://localhost:3000/api/';
 
-export default apiUrl
+export default apiUrl;

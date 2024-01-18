@@ -16,7 +16,7 @@ function PdfViewer({ pdfUrl }) {
   };
 
   return (
-    <div className="pdf-card-container rounded-lg my-10 border border-violetin shadow-md">
+    <div className="pdf-card-container rounded-xl border border-violetin shadow-md">
       <Document
         file={pdfUrl}
         options={{
@@ -29,7 +29,7 @@ function PdfViewer({ pdfUrl }) {
             pageNumber={pageNumber}
             renderMode="canvas"
             scale={0.6}
-            className="w-full rounded-lg border border-gray-300"
+            className="w-full rounded-xl border border-gray-300"
           />
         ) : (
           <div className="md:flex md:space-x-4 ">
