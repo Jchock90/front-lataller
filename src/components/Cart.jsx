@@ -6,9 +6,9 @@ const ShoppingCart = () => {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const dispatch = useDispatch();
 
-  const handleRemoveItem = (itineraryId) => {
+  const handleRemoveItem = (moduleId) => {
     // Dispatch para eliminar un elemento del carrito
-    dispatch(removeFromCart(itineraryId));
+    dispatch(removeFromCart(moduleId));
   };
 
   return (

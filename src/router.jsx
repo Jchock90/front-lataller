@@ -5,11 +5,11 @@ import Cart from './pages/Cart'
 import SignIn from "./pages/SignIn"
 import SignUp from"./pages/SignUp"
 import Profile from "./pages/Profile"
-import Cities from "./pages/Cities";
+import Workshops from "./pages/Workshops";
 import MainLayout from "./layouts/MainLayout";
-import CitiesLayout from "./layouts/CitiesLayout";
-import CityDetailsLayout from "./layouts/CityDetailsLayout";
-import CityDetailsPage from "./pages/CityDetailsPage";
+import WorkshopsLayout from "./layouts/WorkshopsLayout";
+import WorkshopDetailsLayout from "./layouts/WorkshopDetailsLayout";
+import WorkshopDetailsPage from "./pages/WorkshopDetailsPage";
 
 const router = createBrowserRouter([
     {   
@@ -28,17 +28,17 @@ const router = createBrowserRouter([
     },
     { 
         path:"/", 
-        element:<CitiesLayout /> ,
+        element:<WorkshopsLayout /> ,
         children: [
-            { path:"/cities", element:<Cities />},
+            { path:"/workshops", element:<Workshops />},
 
         ]
     },
     { 
         path:"/", 
-        element:<CityDetailsLayout /> ,
+        element:<WorkshopDetailsLayout /> ,
         children: [
-            { path:"/:id", element:<CityDetailsPage />},
+            { path:"/:id", element:<WorkshopDetailsPage />},
 
         ]
     }

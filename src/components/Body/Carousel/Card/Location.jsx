@@ -1,4 +1,4 @@
-export default function Location({ url, city }) {
+export default function Location({ url, workshop }) {
   return (
     <>
       <a href={url} className="flex gap-2 mt-2 mx-2 text-white">
@@ -17,8 +17,8 @@ export default function Location({ url, city }) {
             fill="white"
           />
         </svg>
-        <h3 className="bg-gray-200 opacity-60 text-black px-2 rounded-xl">
-          {city}
+        <h3 className="bg-gray-200 opaworkshop-60 text-black px-2 rounded-xl">
+          {workshop}
         </h3>
       </a>
     </>

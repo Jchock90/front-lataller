@@ -1,4 +1,4 @@
-import Cities from "./Cities";
+import Workshops from "./Workshops";
 import Home from "./Home";
 import Guide from "./Guide";
 import Login from "./Login";
@@ -18,7 +18,7 @@ export default function NavBar() {
             <nav className="lg:text-[14px] md:text-[10px] mx-10 justify-between hidden  md:flex md:gap-4 md:items-center uppercase " id="navStyle">
                 <div className="justify-between hidden  md:flex md:gap-4 md:items-center uppercase" id="navStyle">
                 <Home />
-                <Cities />
+                <Workshops />
                 <Guide />
                 <Cart/>
                 </div>

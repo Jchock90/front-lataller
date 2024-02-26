@@ -1,5 +1,5 @@
 import React from 'react';
-import FooterCities from './FooterCities';
+import FooterWorkshops from './FooterWorkshops';
 import FooterHome from './FooterHome';
 import FooterLogin from './FooterLogin';
 import FooterGuide from './FooterGuide';
@@ -21,7 +21,7 @@ const Footer = () => (
             <ul className="text-gray-500 dark:text-gray-400 font-medium text-center md:text-left">
               <nav className="flex flex-col justify-left gap-4 text-gray-500 dark:text-gray-400 font-medium">
                 <FooterHome />
-                <FooterCities />
+                <FooterWorkshops />
                 <FooterGuide />
                 <FooterLogin />
               </nav>

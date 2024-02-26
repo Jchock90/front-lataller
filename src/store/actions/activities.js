@@ -6,7 +6,7 @@ const read_activities = createAsyncThunk(
     'read_activities',
     async (obj) =>{
         try {
-            let data = await axios(apiUrl + 'activities?itinerary_id=' + obj._id)
+            let data = await axios(apiUrl + 'activities?module_id=' + obj._id)
             return{
                 activities:data.data.response
             }

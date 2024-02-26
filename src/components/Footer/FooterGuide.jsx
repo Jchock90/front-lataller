@@ -1,6 +1,6 @@
 import { Link as Anchor } from "react-router-dom";
 
-export default function FooterCities() {
+export default function FooterWorkshops() {
   return (
     <>
       <Anchor

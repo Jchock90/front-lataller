@@ -14,8 +14,8 @@ import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const ItineraryCard = ({
-  itinerary,
+const ModuleCard = ({
+  module,
   onToggleLike,
   isLiked,
   likeCount,
@@ -28,12 +28,12 @@ const ItineraryCard = ({
   // Usa useDispatch para obtener la función dispatch
   const dispatch = useDispatch();
 
-  const toggleExpand = (itineraryId) => {
+  const toggleExpand = (moduleId) => {
     if (isExpanded) {
       onToggleExpand(null);
       setShowPDF(false);
     } else {
-      onToggleExpand(itineraryId);
+      onToggleExpand(moduleId);
       setShowPDF(true);
     }
   };
@@ -48,9 +48,9 @@ const ItineraryCard = ({
       const response = await axios.post(
         "http://localhost:3000/api/create-preference",
         {
-          title: itinerary.name,
+          title: module.name,
           quantity: 1,
-          price: itinerary.price,
+          price: module.price,
         }
       );
       const { id } = response.data;
@@ -68,9 +68,9 @@ const ItineraryCard = ({
       // Agrega el itinerario al carrito
       dispatch(
         addToCart({
-          name: itinerary.name,
-          price: itinerary.price,
-          photo: itinerary.photo,
+          name: module.name,
+          price: module.price,
+          photo: module.photo,
         })
       );
     }
@@ -88,7 +88,7 @@ const ItineraryCard = ({
           <div className="flex items-center ">
             <ExpandButton
               isExpanded={isExpanded}
-              onToggleExpand={() => toggleExpand(itinerary._id)}
+              onToggleExpand={() => toggleExpand(module._id)}
             />
             <p
               className="ml-2 text-md md:text-xl lg:text-xl font-bold text-gray-600 lowercase"
@@ -97,7 +97,7 @@ const ItineraryCard = ({
               Ver material
             </p>
           </div>
-{/*           <h1 className="ml-2 text-md md:text-xl lg:text-xl font-light">{itinerary.name}</h1>
+{/*           <h1 className="ml-2 text-md md:text-xl lg:text-xl font-light">{module.name}</h1>
  */}          <button onClick={handleBuy} className=" w-[120px]  md:w-[170px] lg:w-[170px] h-[30px] shadow-md border-2 ml-2 text-sm md:text-xl lg:text-xl font-semibold  text-white text-tracking-wider text-center  bg-violetin border-white hover:border-b-4 hover:border-[#b7f708] rounded-xl  flex items-center justify-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:bg-black">
           Agregar al carrito
         </button>
@@ -106,31 +106,31 @@ const ItineraryCard = ({
           <Wallet initialization={{ preferenceId: preferenceId }} />
         )}
         <img
-          src={itinerary.photo}
-          alt={itinerary.name}
+          src={module.photo}
+          alt={module.name}
           className="w-full h-40 object-cover mb-1 rounded-xl"
         />
         <div className="flex flex-row justify-evenly py-0 items-start mb-10">
           <div className="text-center">
             <p className="text-sm font-semibold mr-2">Teacher:</p>
-            <p className="text-sm">{itinerary.city_id.admin_id.name}</p>
+            <p className="text-sm">{module.workshop_id.admin_id.name}</p>
             <img
-              src={itinerary.city_id.admin_id.photo}
-              alt={itinerary.city_id.admin_id.name}
+              src={module.workshop_id.admin_id.photo}
+              alt={module.workshop_id.admin_id.name}
               className="w-16 h-16 object-cover rounded-full mb-4 circular-image"
             />
           </div>
           <div className="text-center">
             <p className="text-sm p-0 font-semibold mr-2">Temas</p>
-            <p className="text-sm">{itinerary.tags}</p>
+            <p className="text-sm">{module.tags}</p>
           </div>
           <div className="text-center">
             <p className="text-sm font-semibold mr-2">Nivel</p>
-            <p className="text-sm">{itinerary.duration}</p>
+            <p className="text-sm">{module.duration}</p>
           </div>
           <div className="text-center">
             <p className="text-sm font-semibold mr-2">Costo</p>
-            <p className="text-sm">{/* "💵".repeat */ itinerary.price} ARS</p>
+            <p className="text-sm">{/* "💵".repeat */ module.price} ARS</p>
           </div>
         </div>
         {showPDF && (
@@ -148,17 +148,17 @@ const ItineraryCard = ({
             Audio <span className="font-bold"> introductorio </span> del taller
             </h2>
             <AudioPlayer
-              audioUrl={itinerary.audio}
-              textAudio={itinerary.textAudio}
+              audioUrl={module.audio}
+              textAudio={module.textAudio}
             />
             <div className="my-4">
-              <PdfViewer pdfUrl={itinerary.comments} />
+              <PdfViewer pdfUrl={module.comments} />
             </div>
           </div>
         )}
       </div>
       <Anchor
-        to="/cities"
+        to="/workshops"
         className="flex justify-center text-4xl  rounded-xl p-2 lowercase"
         id="gothicFont"
       >
@@ -168,4 +168,4 @@ const ItineraryCard = ({
   );
 }
 
-export default ItineraryCard;
+export default ModuleCard;

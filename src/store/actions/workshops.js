@@ -8,7 +8,7 @@ const read_carousel = createAsyncThunk(
     'read_carousel',
     async()=>{
         try {
-            let data = await axios.get(apiUrl + 'cities/carousel')
+            let data = await axios.get(apiUrl + 'workshops/carousel')
 
         return {
             carousel: data.data.data
@@ -23,42 +23,42 @@ const read_carousel = createAsyncThunk(
     }
 )
 
-const read_cities = createAsyncThunk(
-    'read_cities',
+const read_workshops = createAsyncThunk(
+    'read_workshops',
     async ( obj ) => {
         try {
-            let data = await axios.get(apiUrl + 'cities?city=' + obj.text )
+            let data = await axios.get(apiUrl + 'workshops?workshop=' + obj.text )
             return {
-                cities: data.data.response,
+                workshops: data.data.response,
             }
             
         } catch (error) {
             return{
-                cities: []
+                workshops: []
             }
         }
     }
  )
  
- const read_cityDetails = createAsyncThunk (
-     'read_cityDetails',
+ const read_workshopDetails = createAsyncThunk (
+     'read_workshopDetails',
      
      async ( {id} ) => {
          try {
-             let data = await axios.get(apiUrl + 'cities/' + id)
+             let data = await axios.get(apiUrl + 'workshops/' + id)
              return{
-                 city: data.data.response,
+                 workshop: data.data.response,
                 }
                 
             } catch (error) {
                 return{
-                    city: []
+                    workshop: []
                 }
             }
         }
         )
 
-const cities_actions = { read_carousel, read_cities, read_cityDetails }
+const workshops_actions = { read_carousel, read_workshops, read_workshopDetails }
 
-export default cities_actions
+export default workshops_actions
 

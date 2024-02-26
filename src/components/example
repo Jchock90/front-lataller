@@ -1,0 +1,1728 @@
+//codigo back-end relacionado a jwt y passport
+
+//carpeta routes, archivo auth.js
+
+import { Router } from "express";
+import passport from "../middlewares/passport.js";
+
+import register from "../controllers/auth/register.js";
+import signin from "../controllers/auth/signin.js";
+import token from "../controllers/auth/token.js";
+import signout from "../controllers/auth/signout.js";
+
+import isValidToken from "../middlewares/isValidToken.js";
+import isPassOk from "../middlewares/isPassOk.js";
+import notExistsUser from "../middlewares/notExistsUser.js";
+import isValidPass from "../middlewares/isValidPass.js";
+import existsUser from "../middlewares/existsUser.js";
+import validator from "../middlewares/validator.js";
+
+import registerSchema from "../schemas/register.js";
+import signinSchema from "../schemas/signin.js";
+
+let authRouter = Router();
+
+
+authRouter.post(
+  "/register",
+  validator(registerSchema),
+  existsUser,
+  isValidPass,
+  register
+);
+authRouter.post(
+  "/signin",
+  validator(signinSchema),
+  notExistsUser,
+  isPassOk,
+  isValidToken,
+  signin
+);
+authRouter.post(
+  "/token",
+  //middleware para destokenizar el token (debe recibir un token y convertirlo en los datos del usuario)
+  passport.authenticate("jwt", { session: false }),
+  //middleware para generar un nuevo token (se puyede usar el mismo que para el login)
+  isValidToken,
+  token
+);
+authRouter.post(
+  "/signout",
+  passport.authenticate("jwt", { session: false }),
+  signout
+);
+
+export default authRouter;
+
+
+//carpeta middlewares, archivo passport.js
+
+import User from "../models/User.js";
+import passport from "passport";
+import { Strategy, ExtractJwt } from "passport-jwt";
+
+export default passport.use(
+  "jwt",
+  new Strategy(
+    {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.SECRET_KEY,
+    },
+    async (jwt_payload, done) => {
+      try {
+        let user = await User.findOne(
+          { mail: jwt_payload.mail },
+          "-_id -__v -password"
+        );
+        if (user) {
+          return done(null, user); 
+        } else {
+          return done(null);
+        }
+      } catch (error) {
+        return done(error);
+      }
+    }
+  )
+);
+
+
+//carpeta middlewares, archivo isValidToken.js
+
+
+import jwt from 'jsonwebtoken'
+
+export default (req,res,next)=> {
+    try {
+        let token = jwt.sign(
+            { mail:req.user.mail },     //objeto a convertir en token (que nos sirva para identificar al usuario)
+            process.env.SECRET_KEY,     //palabra que sirve de "llave" para tokenizar
+            { expiresIn: 60*60*24*7 }   //expiración en segundos
+        )
+        req.token = token
+        //console.log(req.token);
+        return next()
+    } catch (error) {
+        return next(error)
+    }
+}
+
+
+//carpeta middlewares, archivo validator.js
+
+
+export default (schema) => [
+    (req, res, next) => {
+      const validation = schema.validate(req.body, { abortEarly: false });
+      if (validation.error) {
+        return res.status(400).json({
+          success: false,
+          messages: validation.error.details.map((error) => error.message),
+        });
+      }
+      return next();
+    },
+  ];
+  
+
+
+//codigo back-end relacionado a users e modules
+
+//carpeta controllers, carpeta auth, archivo register.js
+
+import User from "../../models/User.js";
+
+export default async (req,res,next)=> {
+    try {
+        let one = await User.create(req.body)
+        return res.status(201).json({
+            success: true,
+            message: 'user created',
+            response: one._id
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+//carpeta controllers, carpeta auth, archivo signin.js
+
+export default (req,res, next)=> {
+    try {
+        return res.status(200).json({
+            success:true,
+            message: 'user logged in',
+            response: {
+                token: req.token,
+                user: req.user
+            }
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+//carpeta controllers, carpeta auth, archivo signout.js
+
+export default (req, res, next) => {
+    try {
+      return res.status(200).json({
+        success: true,
+        message: "user logged out",
+        response: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+
+//carpeta controllers, carpeta auth, archivo token.js
+
+export default (req, res, next) => {
+    try {
+      return res.status(200).json({
+        success: true,
+        message: "user logged in with token",
+        response: {
+          token: req.token,
+          user: req.user,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+//carpeta controllers, carpeta users, archivo create.js
+
+import User from "../../models/User.js";
+
+export default async (req, res, next) => {
+    try{
+        let newUser = await User.create(req.body)
+        return res.status(201).json({
+            success: true,
+            message: 'user created',
+            response: newUser
+        })
+    } catch(error){
+        next(error);
+    }
+}
+
+//carpeta controllers, carpeta users, archivo destroy.js
+
+import User from '../../models/User.js'
+
+export default async (req,res,next) => {
+    try {
+        let deletedUser = await User.findByIdAndDelete(req.params.id)
+        return res.status(200).json({
+            success: true,
+            message: 'user deleted',
+            response: deletedUser.id
+        })
+        
+    } catch (error) {
+    next(error);
+    }
+}
+
+//carpeta controllers, carpeta users, archivo read.js
+
+import User from '../../models/User.js'
+
+export default async (req, res, next) =>{
+    try {
+    
+        let allUsers = await User.find()
+
+        if (allUsers.length > 0) {
+            return res.status(200).json({
+                succes: true,
+                message: 'users found',
+                response: allUsers
+            })
+        } else{
+            return res.status(404).json({
+                success: false,
+                message: 'not found',
+                response: null
+            })
+        }
+    } catch (error) {
+        next(error);
+    }
+}
+
+//carpeta controllers, carpeta users, archivo readOne.js
+
+import User from "../../models/User.js";
+
+export default async (req, res, next) => {
+    try {
+        // // let oneUserId = await User.findById( req.params.id)
+
+        let oneUser = await User
+        .findOne({_id: req.params.id })
+        .select('mail photo -_id')
+
+        if (oneUser) {
+            return res.status(200).json({
+                success: true,
+                message: 'user found',
+                response: oneUser
+            })
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: 'not found',
+                response: null
+            })
+        }
+    } catch (error) {
+        next(error);
+    }
+}
+
+//carpeta controllers, carpeta users, archivo update.js
+
+import User from "../../models/User.js";
+
+export default async (req, res, next) => {
+    try {
+        let updatedUser = await User.findByIdAndUpdate(
+            req.params.u_id,
+            req.body,
+            { new: true }
+        ).select('name photo mail')
+        return res.status(200).json({
+            success: true,
+            message: 'user updated',
+            response: updatedUser
+             })
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+//carpeta controllers, carpeta modules, archivo create.js
+
+import Module from '../../models/Module.js';
+
+export default async (req, res, next) => {
+    try {
+        let data = req.body
+        let newModule = await Module.create(data)
+        return res.status(201).json({
+            success: true,
+            message: 'module created',
+            response: newModule._id
+        })
+    } catch (error) {
+        next(error);
+    }
+}  
+
+//carpeta controllers, carpeta modules, archivo destroy.js
+
+import Module from "../../models/Module.js";
+
+export default async (req, res, next) => {
+    try {
+        let { id } = req.params
+        let one = await Module.findByIdAndDelete(id)
+        return res.status(200).json({
+            success: true,
+            message: 'module deleted',
+            response: one._id
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+//carpeta controllers, carpeta modules, archivo read.js
+
+import Module from '../../models/Module.js'
+
+export default async (req,res,next)=> {
+    try {
+        let queries = {}
+        if (req.query.workshop_id) {
+            queries.workshop_id = req.query.workshop_id
+        }
+        let all = await Module
+            .find(queries,'-__v -createdAt -updatedAt')
+            .populate({
+                path: "workshop_id",
+                select: "workshop photo admin_id",
+                populate: {
+                    path: "admin_id",
+                    select: "name photo"
+                }
+            })
+        return res.status(200).json({
+            success: true,
+            message: 'modules found',
+            response: all
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+//carpeta controllers, carpeta modules, archivo readOne.js
+
+import Module from "../../models/Module.js";
+
+export default async (req, res, next) => {
+    try {
+
+        let oneModule = await Module
+        .findById(req.params._id)
+        .select('name price duration')
+
+        if (oneModule){
+            return res.status(200).json({
+                success: true,
+                message: 'module found',
+                response: oneModule
+            })
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: 'not found',
+                response: null
+            })
+        }    
+    } catch (error) {
+        next(error)
+    }
+}
+
+//carpeta controllers, carpeta modules, archivo update.js
+
+
+import Module from "../../models/Module.js";
+
+export default async (req, res, next) => {
+    try {
+        let { id } = req.params
+        let data = req.body
+        let one = await Module.findOneAndUpdate(
+            { _id:id },
+            data,
+            { new:true }
+        )
+        if (one) {
+            return res.status(200).json({
+                succes: true,
+                message: 'module found',
+                response: one._id
+            })
+        } else {
+            return res.status(200).json({
+                succes: false,
+                message: 'module not found',
+                response: null
+            })
+        }
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+//carpeta models, archivo Module.js
+
+import { model,Schema,Types } from "mongoose";
+
+let collection = "modules"
+let schema = new Schema({
+    name: { type:String,required:true },
+    workshop_id: { type:Types.ObjectId,ref:'workshops',required:true },
+    price: { type:Number,required:true },
+    duration: { type:Number,required:true },
+    tags: [{ type:String,required:true }],
+    photo: { type:String,required:true },
+    comments: { type:String,required:false},
+    audio: { type:String,required:false},
+    textAudio: { type:String,required:true}
+},{
+    timestamps: true
+})
+
+let Module = model(collection,schema)
+export default Module
+
+//carpeta models, archivo User.js
+
+import { model, Schema } from "mongoose";
+
+let collection = 'users'
+
+let schema = new Schema({
+    name: {type: String, required: true},
+    lastName: {type: String, required: true},
+    mail: {type: String, required: true, unique: true},
+    photo: {type: String, default: 'https://www.cinemascomics.com/wp-content/uploads/2020/06/poder-darth-vader.jpg' },
+    password: {type: String, required: true},
+    module: {type: String, required: true}
+})
+
+let User = model(collection, schema);
+
+export default User;
+
+//codigo relacionado a routes
+
+//carpeta routes, archivo auth.js
+
+import { Router } from "express";
+import passport from "../middlewares/passport.js";
+
+import register from "../controllers/auth/register.js";
+import signin from "../controllers/auth/signin.js";
+import token from "../controllers/auth/token.js";
+import signout from "../controllers/auth/signout.js";
+
+import isValidToken from "../middlewares/isValidToken.js";
+import isPassOk from "../middlewares/isPassOk.js";
+import notExistsUser from "../middlewares/notExistsUser.js";
+import isValidPass from "../middlewares/isValidPass.js";
+import existsUser from "../middlewares/existsUser.js";
+import validator from "../middlewares/validator.js";
+
+import registerSchema from "../schemas/register.js";
+import signinSchema from "../schemas/signin.js";
+
+let authRouter = Router();
+
+
+authRouter.post(
+  "/register",
+  validator(registerSchema),
+  existsUser,
+  isValidPass,
+  register
+);
+authRouter.post(
+  "/signin",
+  validator(signinSchema),
+  notExistsUser,
+  isPassOk,
+  isValidToken,
+  signin
+);
+authRouter.post(
+  "/token",
+  //middleware para destokenizar el token (debe recibir un token y convertirlo en los datos del usuario)
+  passport.authenticate("jwt", { session: false }),
+  //middleware para generar un nuevo token (se puyede usar el mismo que para el login)
+  isValidToken,
+  token
+);
+authRouter.post(
+  "/signout",
+  passport.authenticate("jwt", { session: false }),
+  signout
+);
+
+export default authRouter;
+
+//carpeta routes, archivo modules.js
+
+import express from 'express';
+import create from '../controllers/modules/create.js';
+import read from '../controllers/modules/read.js';
+import readOne from '../controllers/modules/readOne.js';
+import update from '../controllers/modules/update.js';
+import destroy from '../controllers/modules/destroy.js';
+
+let router = express.Router();
+
+router.post('/', create)
+router.get('/', read)
+router.get('/:_id', readOne)
+router.put('/:u_id', update)
+router.delete('/:id', destroy)
+
+export default router
+
+//carpeta routes, archivo users.js
+
+import express from 'express';
+let router = express.Router();
+
+import create from '../controllers/users/create.js';
+import read from '../controllers/users/read.js';
+import readOne from '../controllers/users/readOne.js';
+import update from '../controllers/users/update.js';
+import destroy from '../controllers/users/destroy.js';
+
+
+router.post('/register', create)
+router.get('/', read)
+router.get('/:id', readOne )
+router.put('/:u_id', update)
+router.delete('/:id', destroy)
+
+export default router;
+
+//carpeta schemas, archivo signin.js
+
+import joi from "joi";
+
+let signinSchema = joi.object({
+    mail: joi.string().required().min(8).max(30).messages({
+        'string.min': "mail must have at least 8 characters please!",
+        "string.max": "mail must be less than 21 characters please!",
+        "any.required": "mail is required", //para cuando NO se envía el dato
+        "string.empty": "mail is required"  //para cuando se envía VACÍO
+    }),
+    password: joi.string().required().min(8).max(20).messages({
+        'string.min': "password must have at least 8 characters please!",
+        "string.max": "password must be less than 21 characters please!",
+        "any.required": "password is required", //para cuando NO se envía el dato
+        "string.empty": "password is required"  //para cuando se envía VACÍO
+    }),
+})
+
+export default signinSchema
+
+
+// archivo app.js (codigo relacionado a compras, en este caso mercadopago)
+
+import 'dotenv/config.js';
+import './config/database.js';
+import __dirname from './utils.js';
+import express from 'express';
+import path from 'path';
+import logger from 'morgan';
+import indexRouter from './routes/index.js';
+import errorHandler from './middlewares/errorHandler.js';
+import notFoundHandler from './middlewares/notFoundHandler.js';
+import cors from 'cors';
+/* import { createPreference } from './controllers/payment.js'; // Importa la función del controlador
+ */
+let app = express();
+
+
+import { MercadoPagoConfig, Preference } from 'mercadopago';
+
+
+const client = new MercadoPagoConfig({ 
+  accessToken: 'TEST-2796942292569927-120110-eee04a94ae08c915542624ba7fc7930c-1574144320'
+});
+
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+// MIDDLEWARES
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ROUTER
+app.use('/api', indexRouter);
+
+// RUTA PARA CREAR PREFERENCIA
+app.post('/api/create-preference', async (req, res) => {
+    try {
+        const body = {
+            items: [
+                {
+                    title: req.body.title,
+                    quantity: Number(req.body.quantity),
+                    unit_price: Number(req.body.price),
+                    currency_id: "ARS",
+                },
+            ],
+            back_urls: {
+                success: "https://www.youtube.com",
+                failure: "https://www.youtube.com",
+                pending: "https://www.youtube.com",
+            },
+            auto_return: "approved",
+        };
+        
+        const preference = new Preference(client);
+        const result = await preference.create({ body });
+
+        res.json({
+            id: result.id,
+        });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            error: "Error al crear la preferencia",
+        });
+    }
+});
+
+
+app.use(notFoundHandler);
+// ERROR HANDLER
+app.use(errorHandler);
+
+
+
+export default app;
+
+//codigo front-end
+
+//carpeta components, archivo cart.jsx
+
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { removeFromCart } from "../store/actions/cart";
+
+const ShoppingCart = () => {
+  const cartItems = useSelector((state) => state.cart.cartItems);
+  const dispatch = useDispatch();
+
+  const handleRemoveItem = (moduleId) => {
+    // Dispatch para eliminar un elemento del carrito
+    dispatch(removeFromCart(moduleId));
+  };
+
+  return (
+    <div className="flex flex-col items-center pt-10">
+            <h2 className="text-6xl text-black font-bold rounded-xl p-2 lowercase" id="gothicFont">Carrito</h2>
+
+    <div className="flex flex-col items-center pt-10" id="navStyle">
+      {cartItems.map((item) => (
+        <div key={item.id} className="flex flex-col items-center w-[360px] mb-4 p-2 bg-gray-100 rounded-xl">
+          <img
+            src={item.photo}
+            alt={item.name}
+            className="w-full h-40 object-cover mb-2 rounded-xl"
+          />
+          <div className="text-center mb-2">
+            <h3 className="text-xl font-bold">{item.name}</h3>
+            <p className="text-gray-600">{item.price} ARS</p>
+          </div>
+          <button
+            onClick={() => handleRemoveItem(item.id)}
+            className="w-[80px] h-[40px] shadow-md border-2 font-semibold text-white text-tracking-wider text-center  bg-violetin border-white hover:border-b-4 hover:border-[#b7f708] rounded-xl px-4 py-2 pt-3 flex items-center justify-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:bg-black"
+          >
+            Eliminar
+          </button>
+        </div>
+      ))}
+      {cartItems.length === 0 && (
+        <p className="text-gray-600 text-4xl pt-10" id="navStyle">El carrito está vacío</p>
+      )}
+    </div>
+    </div>
+  );
+};
+
+export default ShoppingCart;
+
+//carpeta components, archivo Modules.jsx
+
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import module_action from "../store/actions/modules";
+import activity_action from "../store/actions/activities";
+import ModuleList from "./ModuleList";
+
+const { read_modules_from_workshop } = module_action;
+const { read_activities } = activity_action;
+
+function Modules() {
+  const { id } = useParams();
+  const modules_redux = useSelector(
+    (store) => store.modules.modules
+  );
+  const activities_redux = useSelector(
+    (store) => store.activities.activities 
+  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(read_modules_from_workshop({ workshop_id: id }));
+    dispatch(read_activities({ _id: id })); 
+  }, [dispatch, id]);
+
+  const [expandedModule, setExpandedModule] = useState(null);
+  const [likes, setLikes] = useState(
+    Array(modules_redux.length).fill(false)
+  );
+  const [likeCount, setLikeCount] = useState(
+    Array(modules_redux.length).fill(0)
+  );
+
+  const toggleExpand = (moduleId) => {
+    if (expandedModule === moduleId) {
+      setExpandedModule(null);
+    } else {
+      setExpandedModule(moduleId);
+    }
+  };
+
+  const toggleLike = (index) => {
+    const newLikes = [...likes];
+    newLikes[index] = !newLikes[index];
+    setLikes(newLikes);
+
+    const newLikeCount = [...likeCount];
+    if (newLikes[index]) {
+      newLikeCount[index]++;
+    } else {
+      newLikeCount[index]--;
+    }
+    setLikeCount(newLikeCount);
+  };
+
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <ModuleList
+        modules={modules_redux}
+        likes={likes}
+        likeCounts={likeCount}
+        expandedModule={expandedModule}
+        onToggleLike={toggleLike}
+        onToggleExpand={toggleExpand}
+        activities={activities_redux}
+      />
+    </div>
+  );
+}
+
+export default Modules;
+
+//carpeta components, archivo ModuleCard.jsx
+
+import React, { useState } from "react";
+import LikeButton from "./LikeButton";
+import ExpandButton from "./ExpandButton";
+import PdfViewer from "./PdfViewer";
+import AudioPlayer from "./AudioPlayer";
+import { Link as Anchor } from "react-router-dom";
+import { useDispatch } from "react-redux"; // Importa useDispatch
+import { addToCart } from "../store/actions/cart"; // Importa la acción addToCart
+import "react-pdf/dist/esm/Page/TextLayer.css";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import { pdfjs } from "react-pdf";
+import axios from "axios";
+import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+const ModuleCard = ({
+  module,
+  onToggleLike,
+  isLiked,
+  likeCount,
+  onToggleExpand,
+  isExpanded,
+  activities,
+}) => {
+  const [showPDF, setShowPDF] = useState(false);
+
+  // Usa useDispatch para obtener la función dispatch
+  const dispatch = useDispatch();
+
+  const toggleExpand = (moduleId) => {
+    if (isExpanded) {
+      onToggleExpand(null);
+      setShowPDF(false);
+    } else {
+      onToggleExpand(moduleId);
+      setShowPDF(true);
+    }
+  };
+
+  const [preferenceId, setPreferenceId] = useState(null);
+  initMercadoPago("TEST-ee3f5966-ef2d-4c14-9efa-4bca885b972e", {
+    locale: "es-AR",
+  });
+
+  const createPreference = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/create-preference",
+        {
+          title: module.name,
+          quantity: 1,
+          price: module.price,
+        }
+      );
+      const { id } = response.data;
+      return id;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleBuy = async () => {
+    const id = await createPreference();
+    if (id) {
+      setPreferenceId(id);
+
+      // Agrega el itinerario al carrito
+      dispatch(
+        addToCart({
+          name: module.name,
+          price: module.price,
+          photo: module.photo,
+        })
+      );
+    }
+  };
+
+
+
+  return (
+    <div>
+      <div
+        className="relative rounded-xl w-[400px] md:w-[760px] lg:w-[760px]"
+        id="navStyle"
+      >
+        <div className="flex h-[60px] justify-between items-center border-2 border-white bg-gray-200 p-4 rounded-xl mb-1">
+          <div className="flex items-center ">
+            <ExpandButton
+              isExpanded={isExpanded}
+              onToggleExpand={() => toggleExpand(module._id)}
+            />
+            <p
+              className="ml-2 text-md md:text-xl lg:text-xl font-bold text-gray-600 lowercase"
+              id="gothicFont"
+            >
+              Ver material
+            </p>
+          </div>
+{/*           <h1 className="ml-2 text-md md:text-xl lg:text-xl font-light">{module.name}</h1>
+ */}          <button onClick={handleBuy} className=" w-[120px]  md:w-[170px] lg:w-[170px] h-[30px] shadow-md border-2 ml-2 text-sm md:text-xl lg:text-xl font-semibold  text-white text-tracking-wider text-center  bg-violetin border-white hover:border-b-4 hover:border-[#b7f708] rounded-xl  flex items-center justify-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:bg-black">
+          Agregar al carrito
+        </button>
+        </div>
+        {preferenceId && (
+          <Wallet initialization={{ preferenceId: preferenceId }} />
+        )}
+        <img
+          src={module.photo}
+          alt={module.name}
+          className="w-full h-40 object-cover mb-1 rounded-xl"
+        />
+        <div className="flex flex-row justify-evenly py-0 items-start mb-10">
+          <div className="text-center">
+            <p className="text-sm font-semibold mr-2">Teacher:</p>
+            <p className="text-sm">{module.workshop_id.admin_id.name}</p>
+            <img
+              src={module.workshop_id.admin_id.photo}
+              alt={module.workshop_id.admin_id.name}
+              className="w-16 h-16 object-cover rounded-full mb-4 circular-image"
+            />
+          </div>
+          <div className="text-center">
+            <p className="text-sm p-0 font-semibold mr-2">Temas</p>
+            <p className="text-sm">{module.tags}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-semibold mr-2">Nivel</p>
+            <p className="text-sm">{module.duration}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-semibold mr-2">Costo</p>
+            <p className="text-sm">{/* "💵".repeat */ module.price} ARS</p>
+          </div>
+        </div>
+        {showPDF && (
+          <div className="flex flex-col items-center justify-center">
+            {/* <div className=" flex flex-col justify-center border-2 border-black rounded-xl  items-center"
+            style={{
+              backgroundImage: `url(${src})`,
+              width: "100%",
+              height: "100px", // Ajusta la altura según sea necesario
+            }}
+            >
+            
+            </div> */}
+            <h2 className="flex justify-center text-xl gap-2 " id="navStyle">
+            Audio <span className="font-bold"> introductorio </span> del taller
+            </h2>
+            <AudioPlayer
+              audioUrl={module.audio}
+              textAudio={module.textAudio}
+            />
+            <div className="my-4">
+              <PdfViewer pdfUrl={module.comments} />
+            </div>
+          </div>
+        )}
+      </div>
+      <Anchor
+        to="/workshops"
+        className="flex justify-center text-4xl  rounded-xl p-2 lowercase"
+        id="gothicFont"
+      >
+        Atrás
+      </Anchor>
+    </div>
+  );
+}
+
+export default ModuleCard;
+
+//carpeta components, archivo ModuleList.jsx
+
+import React from "react";
+import ModuleCard from "./ModuleCard";
+
+function ModuleList({
+  modules,
+  likes,
+  likeCounts,
+  expandedModule,
+  onToggleLike,
+  onToggleExpand,
+  activities,
+  addToCart, // Nueva prop para pasar la función addToCart
+}) {
+  return (
+    <>
+      <div className="flex flex-col items-center w-full space-y-4 my-6">
+        {modules.map((module, index) => (
+          <ModuleCard
+            key={module._id}
+            module={module}
+            onToggleLike={() => onToggleLike(index)}
+            isLiked={likes[index]}
+            likeCount={likeCounts[index]}
+            onToggleExpand={() => onToggleExpand(module._id)}
+            isExpanded={expandedModule === module._id}
+            activities={activities}
+            addToCart={addToCart} // Pasando la función addToCart
+          />
+        ))}
+        {modules.length === 0 && (
+          <div className="p-8 w-[70vw] mb-8 rounded-xl" id="navStyle">
+            <h2 className="text-4xl text-center">No se encontraron talleres</h2>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default ModuleList;
+
+//carpeta components, archivo UserData.jsx
+
+export default function Users({ user, show, setShow }) {
+    return (
+      <div className="w-[360px] h-[400px] flex flex-col justify-center items-center bg-tertiary sm:bg-white p-[20px] mt-[20px] md:mt-0">
+        <p className="my-2 text-center">{user.name}</p>
+        <p className="my-2 text-center">{user.lastName}</p>
+        <p className="my-2 text-center">{user.module}</p>
+        <img className="my-2 h-full object-cover" src={user.photo} />
+        {show ? (
+          <input
+            type="button"
+            className="w-full bg-primary text-[violetin] hover:bg-secondary focus:outline-none text-white font-bold py-2 px-4 rounded cursor-pointer"
+            value="Hide!"
+            onClick={() => setShow(!show)}
+          />
+        ) : (
+          <input
+            type="button"
+            className="w-full bg-primary hover:bg-secondary focus:outline-none text-black font-bold py-2 px-4 rounded cursor-pointer"
+            value="Mis talleres"
+            onClick={() => setShow(!show)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  
+  //carpeta components, archivo Users.jsx
+
+  import { useSelector } from "react-redux";
+
+export default function Users() {
+  const user_state = useSelector((store) => store.users.users);
+  console.log(user_state);
+  return <div className="w-[300px] hidden md:flex md:flex-wrap">
+    {user_state?.map((each) => <img src={each.photo} key={each._id} className="bg-white w-[150px] h-[150px] object-cover"/>)}
+    </div>;
+}
+
+//carpeta pages, archivo Cart.jsx
+
+import React from "react";
+import ShoppingCart from "../components/Cart";
+
+const Cart = () => {
+  return (
+    <div className="min-h-screen flex flex-col justify-start">
+      <ShoppingCart />
+    </div>
+  );
+};
+
+export default Cart;
+
+
+//carpeta pages, archivo Profile.jsx
+
+import { useRef, useState } from "react";
+import UserData from "../components/UserData";
+import { useDispatch, useSelector } from "react-redux";
+import user_actions from "../store/actions/users";
+const { update_user } = user_actions;
+
+export default function Profile() {
+  const user = useSelector((store) => store.users.user);
+  const name = useRef("");
+  const lastName = useRef("");
+  const module = useRef("");
+  const photo = useRef("");
+  const password = useRef("");
+  const [show, setShow] = useState(false);
+  const dispatch = useDispatch();
+  async function handleUpdate() {
+    try {
+      let data = {};
+      if (name.current.value) {
+        data.name = name.current.value;
+      }
+      if (lastName.current.value) {
+        data.lastName = lastName.current.value;
+      }
+      if (module.current.value) {
+        data.module = module.current.value;
+      }
+      if (photo.current.value) {
+        data.photo = photo.current.value;
+      }
+      if (password.current.value) {
+        data.password = password.current.value;
+      }
+      dispatch(update_user({ data }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  return (
+    <div className="flex flex-col flex-grow items-center justify-center md:flex-row md:justify-evenly">
+      <UserData user={user} show={show} setShow={setShow} />
+      {show && (
+        <form className="flex flex-col items-center justify-center p-[20px] w-[360px] h-[400px] bg-red-200 sm:bg-white my-[20px] md:my-0">
+          <h1 className="text-[36px] font-bold text-center mb-[10px]">
+            Update!
+          </h1>
+          <input
+            ref={name}
+            type="text"
+            className="text-center mb-[10px] bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+            name="name"
+            id="name"
+            defaultValue=""
+            placeholder="Type Name"
+          />
+          <input
+            ref={lastName}
+            type="text"
+            className="text-center mb-[10px] bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+            name="lastName"
+            id="lastName"
+            defaultValue=""
+            placeholder="Type Last Name"
+          />
+          <input
+            ref={module}
+            type="text"
+            className="text-center mb-[10px] bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+            name="module"
+            id="module"
+            defaultValue=""
+            placeholder="Type Country"
+          />
+          <input
+            ref={photo}
+            type="text"
+            className="text-center mb-[10px] bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+            name="photo"
+            id="photo"
+            defaultValue=""
+            placeholder="Type Photo"
+          />
+          <input
+            ref={password}
+            type="password"
+            className="text-center mb-[10px] bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+            name="password"
+            id="password"
+            defaultValue=""
+            placeholder="Type Password"
+          />
+          <input
+            type="button"
+            className="w-full bg-purple-500 hover:bg-purple-400 focus:outline-none text-white font-bold py-2 px-4 rounded cursor-pointer"
+            value="Update!"
+            onClick={handleUpdate}
+          />
+        </form>
+      )}
+    </div>
+  );
+}
+
+//carpeta pages, archivo SignIn.jsx
+
+import React, { useRef, useEffect } from "react";
+import { Link as Anchor, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import user_actions from "../store/actions/users";
+import Swal from "sweetalert2";
+
+const { signin } = user_actions;
+
+export default function FormSignIn() {
+  const mail = useRef("");
+  const password = useRef("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  async function handleSignIn() {
+    let data = {
+      mail: mail.current.value,
+      password: password.current.value,
+    };
+    let responseDispatch = dispatch(signin({ data })).then((res) => {
+      console.log(res);
+      if (res.payload.token) {
+        Swal.fire({
+          icon: "success",
+          title: "Logged in!",
+        });
+        navigate("/");
+      } else if (res.payload.messages) {
+        Swal.fire({
+          title: "Something went wrong!",
+          icon: "error",
+          html: res.payload.messages.map((each) => `<p>${each}</p>`).join(""),
+        });
+      }
+    });
+  }
+
+  let user = useSelector((store) => store);
+  console.log(user);
+  return (
+    <>
+      <div className="flex flex-col flex-grow items-center justify-center py-10 md:flex-row md:justify-evenly">
+        <div className=" w-full max-w-sm border-2  rounded-xl ">
+          <form className="bg-white rounded px-8 pt-6 pb-8 mb-4" id="navStyle">
+            <div className="flex flex-col items-center justify-center lg:justify-start">
+              <p className=" text-4xl lowercase" id="gothicFont">Ingresar:</p>
+
+              <div className="m-4 ">
+                {/* <button type="button">
+                  <svg
+                    className="w-10 h-10 f  text-gray-100 dark:text-black"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 18 19"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.842 18.083a8.8 8.8 0 0 1-8.65-8.948 8.841 8.841 0 0 1 8.8-8.652h.153a8.464 8.464 0 0 1 5.7 2.257l-2.193 2.038A5.27 5.27 0 0 0 9.09 3.4a5.882 5.882 0 0 0-.2 11.76h.124a5.091 5.091 0 0 0 5.248-4.057L14.3 11H9V8h8.34c.066.543.095 1.09.088 1.636-.086 5.053-3.463 8.449-8.4 8.449l-.186-.002Z"
+                      clipRule="evenodd"
+                    /> 
+                  </svg>
+                </button> */}
+              </div>
+            </div>
+            <div className="my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300">
+              <p className="mx-4 mb-0 text-center font-semibold dark:text-black">
+              💘
+              </p>
+            </div>
+
+            <div className="mb-2">
+              <label className="block text-gray-500 text-sm font-bold mb-4">
+                Email
+              </label>
+              <input
+                ref={mail}
+                type="text"
+                name="mail"
+                className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+                placeholder="Tu Email"
+              ></input>
+            </div>
+            <div className="mb-2">
+              <label className="block text-gray-500 text-sm font-bold mb-4">
+                Contraseña
+              </label>
+              <input
+                ref={password}
+                type="password"
+                name="password"
+                className="appearance-none border  rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none"
+                placeholder="******************"
+              ></input>
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                className="bg-[#c3a9f7] text-white font-bold py-2 px-4 rounded focus:outline-none"
+                type="button"
+                onClick={handleSignIn}
+              >
+                Ingreso
+              </button>
+              <a
+                className="inline-block align-baseline font-bold text-sm text-[#c3a9f7] hover:text-blue-800"
+                href="#"
+              >
+                Olvidaste tu contraseña?
+              </a>
+            </div>
+            <div className="flex items-center justify-between text-[#c3a9f7] text-md font-bold pt-8">
+              <p>No tienes una contraseña?</p>
+              <Anchor to="/signup">
+                <button className="inline-block align-baseline font-bold text-sm text-[#c3a9f7] hover:text-blue-800">
+                  Registro
+                </button>
+              </Anchor>
+            </div>
+          </form>
+        </div>
+      </div>
+      </>
+  );
+}
+
+//carpeta store, carpeta actions, archivo cart.js
+
+// components/store/actions/cart.js
+
+import { createAction } from "@reduxjs/toolkit";
+
+export const addToCart = createAction("addToCart", (moduleId) => {
+  return {
+    payload: moduleId,
+  };
+});
+
+export const removeFromCart = createAction("removeFromCart", (moduleId) => {
+  return {
+    payload: moduleId,
+  };
+});
+
+
+//carpeta store, carpeta actions, archivo modules.js
+
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import apiUrl from "../../../apiUrl";
+
+const read_modules_from_workshop = createAsyncThunk(
+    'read_modules_from_workshop',
+    async ( obj ) => {
+        try {
+            let data = await axios.get(apiUrl + 'modules?workshop_id=' + obj.workshop_id )
+            return {
+                modules: data.data.response
+            }
+
+        } catch (error) {
+            return{
+                modules: []
+            }
+        }
+    }
+)
+
+const module_action = { read_modules_from_workshop }
+export default module_action
+
+
+
+//carpeta store, carpeta actions, archivo users.js
+
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import apiUrl from "../../../apiUrl";
+
+const read_6_users = createAsyncThunk(
+    'read_6_users',
+    async()=> {
+        try {
+            let users = await axios(apiUrl+'users')
+            //console.log(users);
+            return {
+                users: users.data.response
+            }
+            
+        } catch (error) {
+            console.log(error);
+            return {
+                users: []
+            }
+        }
+    }
+)
+
+const signin = createAsyncThunk(
+    'signin',
+    async(obj)=>{
+        try {
+            let data = await axios.post(apiUrl+'auth/signin',obj.data)
+            //console.log(data);
+            localStorage.setItem('token',data.data.response.token)
+            return {
+                user: data.data.response.user,
+                token: data.data.response.token,
+                messages: []
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                user: {},
+                token: '',
+                messages: error.response.data.messages || [error.response.data.message]
+            }
+        }
+    }
+)
+
+const signin_token = createAsyncThunk(
+    'signin_token',
+    async()=> {
+        try {
+            let token = localStorage.getItem('token')
+            let authorization = { headers:{ 'Authorization':`Bearer ${token}` } }
+            let data = await axios.post(apiUrl+'auth/token',null,authorization)
+            //console.log(data);
+            localStorage.setItem('token',data.data.response.token)
+            return {
+                user: data.data.response.user,
+                token: data.data.response.token
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                user: {},
+                token: ''
+            }
+        }
+    }
+)
+
+const signout = createAsyncThunk(
+    'signout',
+    async()=> {
+        try {
+            let token = localStorage.getItem('token')
+            let authorization = { headers:{ 'Authorization':`Bearer ${token}` } }
+            let data = await axios.post(apiUrl+'auth/signout',null,authorization)
+            //console.log(data);
+            localStorage.removeItem('token')
+            return {
+                user: {},
+                token: ''
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                user: {},
+                token: ''
+            }
+        }
+    }
+)
+
+const update_user = createAsyncThunk(
+    'update_user',
+    async(obj)=> {
+        try {
+            let token = localStorage.getItem('token')
+            let authorization = { headers:{ 'Authorization':`Bearer ${token}` } }
+            let data = await axios.put(apiUrl+'users',obj.data,authorization)
+            console.log(data);
+            return {
+                user: data.data.response
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                user: {}
+            }
+        }
+
+    }
+)
+
+const user_actions = { read_6_users,signin,signin_token,signout,update_user }
+export default user_actions
+
+
+//carpeta store, carpeta reducers, archivo cart.js
+
+// Carpeta components, carpeta store, carpeta reducers archivo cart.js
+
+import { createReducer } from "@reduxjs/toolkit";
+import { addToCart, removeFromCart } from "../actions/cart";
+
+const initialState = {
+  cartItems: [],
+  cartCount: 0, // Nueva propiedad para contar los elementos en el carrito
+};
+
+const cartReducer = createReducer(initialState, (builder) => {
+  builder
+    .addCase(addToCart, (state, action) => {
+      state.cartItems.push(action.payload);
+      state.cartCount += 1; // Incrementar el recuento al agregar al carrito
+    })
+    .addCase(removeFromCart, (state, action) => {
+      const indexToRemove = action.payload;
+      state.cartItems.splice(indexToRemove, 1);
+      state.cartCount -= 1; // Decrementar el recuento al eliminar del carrito
+    });
+});
+
+export default cartReducer;
+
+
+//carpeta store, carpeta reducers, archivo modules.js
+
+import { createReducer } from "@reduxjs/toolkit";
+import module_action from "../actions/modules";
+
+const { read_modules_from_workshop } = module_action
+
+const initial_state = {
+    modules: []
+}
+
+const module_reducer = createReducer(
+    initial_state,
+    builder => builder
+        .addCase(
+            read_modules_from_workshop.fulfilled,
+            (state, action) => {
+                let new_state = {
+                    ...state,
+                    modules: action.payload.modules
+                }
+                return new_state
+            }
+        )
+)
+
+export default module_reducer
+
+//carpeta store, carpeta reducers, archivo users.js
+
+
+import { createReducer } from "@reduxjs/toolkit";
+import user_actions from "../actions/users";
+const { read_6_users,signin,signin_token,signout,update_user } = user_actions
+
+const initial_state = {
+    users: [],
+    user: {},
+    token: '',
+    isLoggedIn: false,
+    messages: []
+}
+
+const user_reducer = createReducer(
+    initial_state,
+    build=> build.addCase(
+        read_6_users.fulfilled,
+        (state,action)=> {
+            let new_state = {
+                ...state,
+                users: action.payload.users
+            }
+            return new_state
+        }
+    ).addCase(
+        signin.fulfilled,
+        (state,action)=> {
+            let new_state = {
+                ...state,
+                user: action.payload.user,
+                token: action.payload.token,
+                isLoggedIn: true,
+                messages: action.payload.messages
+            }
+            return new_state
+        }
+    ).addCase(
+        signin_token.fulfilled,
+        (state,action)=> {
+            let new_state = {
+                ...state,
+                user: action.payload.user,
+                token: action.payload.token
+            }
+            return new_state
+        }
+    ).addCase(
+        signout.fulfilled,
+        (state,action)=> {
+            let new_state = {
+                ...state,
+                user: action.payload.user,
+                token: action.payload.token,
+                isLoggedIn: false
+            }
+            return new_state
+        }
+    ).addCase(
+        update_user.fulfilled,
+        (state,action)=> {
+            let new_state = {
+                ...state,
+                user: action.payload.user
+            }
+            return new_state
+        }
+    )
+)
+
+export default user_reducer
+
+
+//carpeta store, archivo store.js
+
+// components/store.js
+
+import { configureStore } from "@reduxjs/toolkit";
+import workshopsReducer from "./reducers/workshops";
+import modulesReducer from "./reducers/modules";
+import usersReducer from "./reducers/users";
+import activitiesReducer from "./reducers/activities";
+import cartReducer from "./reducers/cart"; // Asegúrate de importar correctamente el reductor del carrito
+
+export default configureStore({
+  reducer: {
+    workshops: workshopsReducer,
+    modules: modulesReducer,
+    users: usersReducer,
+    activities: activitiesReducer,
+    cart: cartReducer, // Asegúrate de agregar el reductor del carrito correctamente
+  },
+});
+
+
+//archivo App.jsx
+
+import { useEffect } from "react";
+import { RouterProvider } from "react-router-dom";
+import router from "./router";
+import { useDispatch } from "react-redux";
+import user_actions from "./store/actions/users";
+const { signin_token } = user_actions;
+
+function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    let token = localStorage.getItem('token')
+    if (token) {
+      dispatch(signin_token());
+    }
+  }, []);
+  return <RouterProvider router={router} />;
+}
+
+export default App;
+
+
+//archivo main.jsx
+
+import ReactDOM from "react-dom/client"; //sintaxis de las importaciones
+//import QUECOSAMEQUIEROTRAER from './ruta o modulo'
+import App from "./App.jsx";
+import "./index.css";
+import { Provider } from "react-redux";
+import store from "./store/store";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+
+
+//archivo router.jsx
+
+import { createBrowserRouter } from "react-router-dom";
+import Home from './pages/Home'
+import Guide from './pages/Guide'
+import Cart from './pages/Cart'
+import SignIn from "./pages/SignIn"
+import SignUp from"./pages/SignUp"
+import Profile from "./pages/Profile"
+import Workshops from "./pages/Workshops";
+import MainLayout from "./layouts/MainLayout";
+import WorkshopsLayout from "./layouts/WorkshopsLayout";
+import WorkshopDetailsLayout from "./layouts/WorkshopDetailsLayout";
+import WorkshopDetailsPage from "./pages/WorkshopDetailsPage";
+
+const router = createBrowserRouter([
+    {   
+        path: "/",
+        element: <MainLayout />,
+        children: [
+            { path:"/", element:<Home />},
+            { path:"/index", element:<Home />},
+            { path:"/home", element:<Home />},
+            { path:"/guide", element:<Guide />},
+            { path:"/cart", element:<Cart />},
+            { path: "/signin", element: <SignIn />},
+            { path: "/signup", element: <SignUp />},
+            { path: "/profile", element: <Profile /> }
+        ]
+    },
+    { 
+        path:"/", 
+        element:<WorkshopsLayout /> ,
+        children: [
+            { path:"/workshops", element:<Workshops />},
+
+        ]
+    },
+    { 
+        path:"/", 
+        element:<WorkshopDetailsLayout /> ,
+        children: [
+            { path:"/:id", element:<WorkshopDetailsPage />},
+
+        ]
+    }
+])
+
+export default router
+
+//archivo apiUrl.js
+
+const apiUrl = 'http://localhost:3000/api/';
+
+export default apiUrl;

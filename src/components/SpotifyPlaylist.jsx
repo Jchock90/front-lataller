@@ -9,7 +9,7 @@ const SpotifyPlaylist = () => {
       frameBorder="0"
       allowtransparency="true"
       allow="encrypted-media"
-      className='p-3 opacity-80'
+      className='p-3 opaworkshop-80'
     ></iframe>
   );
 };

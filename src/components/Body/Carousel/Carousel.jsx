@@ -89,8 +89,8 @@ export default function Carousel({ data }) {
             >
               <Card
                 src={item.photo}
-                country={item.country}
-                city={item.city}
+                module={item.module}
+                workshop={item.workshop}
                 id={item._id}
               />
             </div>
@@ -123,10 +123,10 @@ export default function Carousel({ data }) {
           />
           {data.slice(counterFromMobile, counterToMobile).map((item, index) => (
             <div
-              key={item.city}
+              key={item.workshop}
               className={`card-transition mobile-slide-in-right delay-${index}`}
             >
-              <Card src={item.photo} city={item.city} country={item.country} />
+              <Card src={item.photo} workshop={item.workshop} module={item.module} />
             </div>
           ))}
           <Arrow

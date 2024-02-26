@@ -1,25 +1,25 @@
 import { createReducer } from "@reduxjs/toolkit";
-import itinerary_action from "../actions/itineraries";
+import module_action from "../actions/modules";
 
-const { read_itineraries_from_city } = itinerary_action
+const { read_modules_from_workshop } = module_action
 
 const initial_state = {
-    itineraries: []
+    modules: []
 }
 
-const itinerary_reducer = createReducer(
+const module_reducer = createReducer(
     initial_state,
     builder => builder
         .addCase(
-            read_itineraries_from_city.fulfilled,
+            read_modules_from_workshop.fulfilled,
             (state, action) => {
                 let new_state = {
                     ...state,
-                    itineraries: action.payload.itineraries
+                    modules: action.payload.modules
                 }
                 return new_state
             }
         )
 )
 
-export default itinerary_reducer
+export default module_reducer

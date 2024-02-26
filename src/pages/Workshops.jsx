@@ -1,16 +1,16 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useRef, useState } from "react";
-import CardCity from "../components/Body/Carousel/Card/CardCity";
+import CardWorkshop from "../components/Body/Carousel/Card/CardWorkshop";
 import { useDispatch, useSelector } from "react-redux";
-import cities_actions from "../store/actions/cities";
-import cities_reducer from "../store/reducers/cities";
+import workshops_actions from "../store/actions/workshops";
+import workshops_reducer from "../store/reducers/workshops";
 
-const { read_cities } = cities_actions;
+const { read_workshops } = workshops_actions;
 
-export default function Cities() {
+export default function Workshops() {
   const [reEffect, setReEffect] = useState(true);
   const text = useRef();
-  const cities_redux = useSelector((store) => store.cities.cities);
+  const workshops_redux = useSelector((store) => store.workshops.workshops);
   const dispatch = useDispatch();
 
   function handlerFilter() {
@@ -18,8 +18,8 @@ export default function Cities() {
   }
   useEffect(() => {
     dispatch(
-      read_cities({
-        cities: cities_reducer,
+      read_workshops({
+        workshops: workshops_reducer,
         text: text.current.value.trim(),
       })
     );
@@ -60,14 +60,14 @@ export default function Cities() {
         </div>
       </label>
       <div className="flex flex-col items-center gap-10 justify-center mb-8 md:flex-wrap md:flex-row">
-        {cities_redux.length > 0 ? (
-          cities_redux.map((each) => (
+        {workshops_redux.length > 0 ? (
+          workshops_redux.map((each) => (
             <>
-              <CardCity
+              <CardWorkshop
                 key={each._id}
                 src={each.photo}
-                city={each.city}
-                country={each.country}
+                workshop={each.workshop}
+                module={each.module}
                 id={each._id}
               />
             </>

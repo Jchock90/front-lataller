@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import itinerary_action from "../store/actions/itineraries";
+import module_action from "../store/actions/modules";
 import activity_action from "../store/actions/activities";
-import ItineraryList from "./ItineraryList";
+import ModuleList from "./ModuleList";
 
-const { read_itineraries_from_city } = itinerary_action;
+const { read_modules_from_workshop } = module_action;
 const { read_activities } = activity_action;
 
-function Itineraries() {
+function Modules() {
   const { id } = useParams();
-  const itineraries_redux = useSelector(
-    (store) => store.itineraries.itineraries
+  const modules_redux = useSelector(
+    (store) => store.modules.modules
   );
   const activities_redux = useSelector(
     (store) => store.activities.activities 
@@ -19,23 +19,23 @@ function Itineraries() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(read_itineraries_from_city({ city_id: id }));
+    dispatch(read_modules_from_workshop({ workshop_id: id }));
     dispatch(read_activities({ _id: id })); 
   }, [dispatch, id]);
 
-  const [expandedItinerary, setExpandedItinerary] = useState(null);
+  const [expandedModule, setExpandedModule] = useState(null);
   const [likes, setLikes] = useState(
-    Array(itineraries_redux.length).fill(false)
+    Array(modules_redux.length).fill(false)
   );
   const [likeCount, setLikeCount] = useState(
-    Array(itineraries_redux.length).fill(0)
+    Array(modules_redux.length).fill(0)
   );
 
-  const toggleExpand = (itineraryId) => {
-    if (expandedItinerary === itineraryId) {
-      setExpandedItinerary(null);
+  const toggleExpand = (moduleId) => {
+    if (expandedModule === moduleId) {
+      setExpandedModule(null);
     } else {
-      setExpandedItinerary(itineraryId);
+      setExpandedModule(moduleId);
     }
   };
 
@@ -55,11 +55,11 @@ function Itineraries() {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <ItineraryList
-        itineraries={itineraries_redux}
+      <ModuleList
+        modules={modules_redux}
         likes={likes}
         likeCounts={likeCount}
-        expandedItinerary={expandedItinerary}
+        expandedModule={expandedModule}
         onToggleLike={toggleLike}
         onToggleExpand={toggleExpand}
         activities={activities_redux}
@@ -68,4 +68,4 @@ function Itineraries() {
   );
 }
 
-export default Itineraries;
+export default Modules;

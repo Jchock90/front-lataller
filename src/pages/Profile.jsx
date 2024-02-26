@@ -8,7 +8,7 @@ export default function Profile() {
   const user = useSelector((store) => store.users.user);
   const name = useRef("");
   const lastName = useRef("");
-  const country = useRef("");
+  const module = useRef("");
   const photo = useRef("");
   const password = useRef("");
   const [show, setShow] = useState(false);
@@ -22,8 +22,8 @@ export default function Profile() {
       if (lastName.current.value) {
         data.lastName = lastName.current.value;
       }
-      if (country.current.value) {
-        data.country = country.current.value;
+      if (module.current.value) {
+        data.module = module.current.value;
       }
       if (photo.current.value) {
         data.photo = photo.current.value;
@@ -63,11 +63,11 @@ export default function Profile() {
             placeholder="Type Last Name"
           />
           <input
-            ref={country}
+            ref={module}
             type="text"
             className="text-center mb-[10px] bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            name="country"
-            id="country"
+            name="module"
+            id="module"
             defaultValue=""
             placeholder="Type Country"
           />

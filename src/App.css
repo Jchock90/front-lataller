@@ -51,11 +51,11 @@
 /* Animaciones para tarjetas en modo tablet/desktop */
 @keyframes tablet-desktop-slide-in-right {
   from {
-    opacity: 0;
+    opaworkshop: 0;
     transform: translateX(20px);
   }
   to {
-    opacity: 1;
+    opaworkshop: 1;
     transform: translateX(0);
   }
 }
@@ -63,11 +63,11 @@
 /* Animaciones para tarjetas en modo mobile */
 @keyframes mobile-slide-in-right {
   from {
-    opacity: 0;
+    opaworkshop: 0;
     transform: translateX(20px);
   }
   to {
-    opacity: 1;
+    opaworkshop: 1;
     transform: translateX(0);
   }
 }

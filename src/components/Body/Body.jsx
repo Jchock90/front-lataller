@@ -9,12 +9,12 @@ import InstagramButton from "../InstagramButton";
 import SpotifyPlaylist from "../SpotifyPlaylist";
 import { useEffect } from "react";
 
-import cities_actions from "../../store/actions/cities";
+import workshops_actions from "../../store/actions/workshops";
 
-const { read_carousel } = cities_actions;
+const { read_carousel } = workshops_actions;
 
 export default function Body() {
-  const carousel_redux = useSelector((store) => store.cities.carousel);
+  const carousel_redux = useSelector((store) => store.workshops.carousel);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function Body() {
           backgroundPosition: "center",
         }}
       >
-        <h2 className="text-2xl text-center lg:text-left bg-gray-100 bg-opacity-30 p-4 rounded-xl lg:mb-40 " id="navStyle">
+        <h2 className="text-2xl text-center lg:text-left bg-gray-100 bg-opaworkshop-30 p-4 rounded-xl lg:mb-40 " id="navStyle">
           <span className="text-4xl" id="gothicFont">
             música{" "}
           </span>

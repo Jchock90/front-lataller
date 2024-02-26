@@ -10,7 +10,7 @@ const { read_6_users } = user_actions;
 export default function SignUp() {
   const name = useRef("");
   const lastName = useRef("");
-  const country = useRef("");
+  const module = useRef("");
   const photo = useRef("");
   const mail = useRef("");
   const password = useRef("");
@@ -27,7 +27,7 @@ export default function SignUp() {
       let data = {
         name: name.current.value,
         lastName: lastName.current.value,
-        country: country.current.value,
+        module: module.current.value,
         photo: photo.current.value,
         mail: mail.current.value,
         password: password.current.value,
@@ -61,13 +61,10 @@ export default function SignUp() {
     }
   }
   return (
-    <div className="relative pt-0">
-      <div className="bg-image-url w-full  h-full object-fill">
-        <img src="https://i.im.ge/2023/09/19/6HUHOp.ejemplo-taller-1.jpg" alt="Taller picture" />
-      </div>
-      <div className="flex justify-center  absolute inset-0 ">
-        <div className=" w-full max-w-md pt-10 ">
-          <form className="bg-white rounded px-8 pt-6 pb-8 mb-4 ">
+    <div>
+    <div className="flex flex-col flex-grow items-center justify-center py-10 md:flex-row md:justify-evenly">
+        <div className=" w-full max-w-sm border-2  rounded-xl  ">
+          <form className="bg-white rounded px-8 pt-6 pb-8 mb-4" id="navStyle">
             <div className="flex flex-col items-center justify-center lg:justify-start">
               <p className=" text-4xl lowercase" id="gothicFont">Registro:</p>
               <div className="m-4">
@@ -89,7 +86,7 @@ export default function SignUp() {
               </div>
             </div>
             <div className="my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300">
-              <p class="mx-4 mb-0 text-center font-semibold dark:text-black">
+              <p className="mx-4 mb-0 text-center font-semibold dark:text-black">
               💘
               </p>
             </div>
@@ -157,10 +154,10 @@ export default function SignUp() {
               </p>
               <div className="inline-block relative w-64">
                 <select
-                  ref={country}
+                  ref={module}
                   type="text"
-                  name="country"
-                  id="country"
+                  name="module"
+                  id="module"
                   className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 >
                   <option>Argentina</option>

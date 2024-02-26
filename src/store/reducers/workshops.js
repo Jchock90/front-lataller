@@ -1,15 +1,15 @@
 // REDUCERS
 import { createReducer } from "@reduxjs/toolkit";
-import cities_actions from "../actions/cities";
-const { read_carousel, read_cities, read_cityDetails } = cities_actions
+import workshops_actions from "../actions/workshops";
+const { read_carousel, read_workshops, read_workshopDetails } = workshops_actions
 
 const initial_state = {
     carousel: [],
-    cities: [],
-    city: {},
+    workshops: [],
+    workshop: {},
 }
 
-const cities_reducer = createReducer(
+const workshops_reducer = createReducer(
     initial_state,
     builder => builder.addCase( 
         read_carousel.fulfilled,
@@ -22,21 +22,21 @@ const cities_reducer = createReducer(
         }
     )
    .addCase(
-            read_cities.fulfilled,
+            read_workshops.fulfilled,
             (state, action) => {
                 let new_state = {
                     ...state,
-                    cities:action.payload.cities
+                    workshops:action.payload.workshops
                 }
                 return new_state
             }
         )
     .addCase(
-        read_cityDetails.fulfilled,
+        read_workshopDetails.fulfilled,
         (state, action) => {
             let new_state = {
                 ...state,
-                city: action.payload.city
+                workshop: action.payload.workshop
             }
             return new_state
         }
@@ -44,5 +44,5 @@ const cities_reducer = createReducer(
 
 )
 
-export default cities_reducer
+export default workshops_reducer
 

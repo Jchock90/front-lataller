@@ -1,5 +1,5 @@
 import Home from "../NavBar/Home";
-import Cities from "../NavBar/Cities";
+import Workshops from "../NavBar/Workshops";
 import Login from "../NavBar/Login";
 import Guide from "../NavBar/Guide";
 import Logout from "../NavBar/Logout";
@@ -36,7 +36,7 @@ export default function HamMenu() {
         {isChecked ? (
           <div className="flex flex-col justify-between gap-6 mt-8 uppercase items-center text-[9px]" id="navStyle">
             <Home />
-            <Cities />
+            <Workshops />
             <Guide />
             <Cart/>
             <div className="flex flex-col items-center lowercase">
